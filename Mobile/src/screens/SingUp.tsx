@@ -11,6 +11,8 @@ import LogoSVG from '@assets/logo.svg';
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
 
+import { api } from '@services/api';
+
 type FormDataProps = {
   name: string;
   email: string;
@@ -42,18 +44,9 @@ export function SingUp() {
     navigation.goBack();
   };
 
-  function handleSignUp({ name, email, password, passwordConfirm }: FormDataProps) {
-    fetch('http://192.168.15.8:3333/users', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, email, password })
-    })
-      .then(response => response.json())
-      .then(data => console.log(data))
-      ;
+  async function handleSignUp({ name, email, password, passwordConfirm }: FormDataProps) {
+    const response = await api.post('/user', { name, email, password });
+
   };
 
   return (
