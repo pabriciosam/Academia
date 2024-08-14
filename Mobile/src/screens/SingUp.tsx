@@ -3,15 +3,17 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup'
 
-import { Center, Heading, ScrollView, Text, VStack, Image } from '@gluestack-ui/themed';
+import { Center, Heading, ScrollView, Text, VStack, Image, useToast } from '@gluestack-ui/themed';
 
 import BackgroundImg from '@assets/background2x.png';
 import LogoSVG from '@assets/logo.svg';
 
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
+import { ToastMessagem } from '@components/ToastMessage';
 
 import { api } from '@services/api';
+import { AppError } from '@utils/AppError';
 
 type FormDataProps = {
   name: string;
@@ -34,6 +36,8 @@ const singUpSchema = yup.object({
 });
 
 export function SingUp() {
+  const toast = useToast();
+
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: yupResolver(singUpSchema)
   });
@@ -44,9 +48,28 @@ export function SingUp() {
     navigation.goBack();
   };
 
-  async function handleSignUp({ name, email, password, passwordConfirm }: FormDataProps) {
-    const response = await api.post('/user', { name, email, password });
+  async function handleSignUp({ name, email, password }: FormDataProps) {
+    try {
+      console.log("TESTE");
+      const response = await api.post('/user', { name, email, password });
+      console.log(response.data);
+    }
+    catch (error) {
+      const isAppError = error instanceof AppError;
 
+      const title = isAppError ? error.message : 'Não foi possível criar a conta.';
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessagem
+            id={id}
+            title={title}
+            action="error"
+            onClose={() => toast.close(id)} />
+        )
+      });
+    }
   };
 
   return (
@@ -136,14 +159,15 @@ export function SingUp() {
             <Button
               title='Criar e acessar'
               onPress={handleSubmit(handleSignUp)}
+              mb='$8'
+            />
+
+            <Button
+              title='Voltar para o login'
+              variant='outline'
+              onPress={handleGoBack}
             />
           </Center>
-
-          <Button
-            title='Voltar para o login'
-            variant='outline'
-            onPress={handleGoBack}
-          />
         </VStack>
       </VStack>
     </ScrollView>

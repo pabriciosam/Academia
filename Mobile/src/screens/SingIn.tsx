@@ -9,15 +9,15 @@ import BackgroundImg from '@assets/background.png';
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
 
-export function SingIn(){
+export function SingIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
-  function handleNewAccount(){
+  function handleNewAccount() {
     navigation.navigate('singUp');
   }
 
-  return(
-    <ScrollView contentContainerStyle={{ flexGrow:1 }} showsVerticalScrollIndicator={false}>
+  return (
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
       <VStack flex={1}>
         <Image
           source={BackgroundImg}
@@ -31,7 +31,7 @@ export function SingIn(){
         <VStack flex={1} px='$10' pb={'$16'}>
           <Center my='$24'>
             <LogoSVG />
-            
+
             <Text color='$gray100' fontSize={'$sm'}>
               Treine sua mente e seu corpo
             </Text>
@@ -52,11 +52,11 @@ export function SingIn(){
               secureTextEntry
             />
 
-            <Button title='Acessar'/>
+            <Button title='Acessar' />
           </Center>
 
           <Center flex={1} justifyContent='flex-end' mt='$4'>
-            <Text color='$gray100' fontSize='$sm' fontFamily='$body'>
+            <Text color='$gray100' fontSize='$sm' fontFamily='$body' mb='$4'>
               Ainda não tem acesso?
             </Text>
 
