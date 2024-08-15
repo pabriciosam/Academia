@@ -5,7 +5,7 @@ import { gluestackUIConfig } from '../../config/gluestack-ui.config'
 import { Box } from '@gluestack-ui/themed';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native'
 
-import { AuthContext } from '@contexts/AuthContext';
+import { useAuth } from '@hooks/useAuth';
 
 import { AuthRoutes } from './auth.routes'
 import { AppRouters } from './app.routes';
@@ -15,8 +15,8 @@ export function Routes() {
 
   theme.colors.background = gluestackUIConfig.tokens.colors.gray700;
 
-  const contextData = useContext(AuthContext);
-  console.log("DADOS DO CLIENTE -> ", contextData)
+  const { user } = useAuth();
+  console.log("DADOS DO CLIENTE -> ", user);
 
   return (
     <Box flex={1} bg="$gray700">
