@@ -50,9 +50,7 @@ export function SingUp() {
 
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
-      console.log("TESTE");
       const response = await api.post('/user', { name, email, password });
-      console.log(response.data);
     }
     catch (error) {
       const isAppError = error instanceof AppError;
