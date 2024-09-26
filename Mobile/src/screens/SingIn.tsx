@@ -42,7 +42,7 @@ export function SingIn() {
   }
 
   async function handleSignIn({ email, password }: FormDataProps) {
-    singIn(email, password);
+    await singIn(email, password);
   };
 
   return (
