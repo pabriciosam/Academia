@@ -14,6 +14,8 @@ import { useAuth } from '@hooks/useAuth';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import * as yup from 'yup';
+import { AppError } from '@utils/AppError';
+import { ToastMessagem } from '@components/ToastMessage';
 
 type FormDataProps = {
   email: string;
@@ -27,6 +29,8 @@ const singInSchema = yup.object({
     .required("Informe a senha!")
     .min(6, "A senha deve ter no mínimo 6 dígitos!")
 });
+
+const toast = useToast();
 
 export function SingIn() {
   const { singIn } = useAuth();
@@ -42,7 +46,25 @@ export function SingIn() {
   }
 
   async function handleSignIn({ email, password }: FormDataProps) {
-    await singIn(email, password);
+    try{
+      await singIn(email, password);
+    }
+    catch (error) {
+      const isAppError = error instanceof AppError;
+
+      const title = isAppError ? error.message : "Não foi possível entrar. Tente novamente!";
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessagem
+            id={id}
+            title={title}
+            action="error"
+            onClose={() => toast.close(id)} />
+        )
+      });
+    }
   };
 
   return (

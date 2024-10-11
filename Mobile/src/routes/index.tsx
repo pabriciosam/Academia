@@ -1,5 +1,3 @@
-import { useContext } from 'react';
-
 import { gluestackUIConfig } from '../../config/gluestack-ui.config'
 
 import { Box } from '@gluestack-ui/themed';
