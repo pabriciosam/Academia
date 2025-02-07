@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Center, Heading, ScrollView, Text, VStack, Image, useToast } from '@gluestack-ui/themed';
 import { useForm, Controller } from 'react-hook-form'
@@ -31,10 +30,9 @@ const singInSchema = yup.object({
     .min(6, "A senha deve ter no mínimo 6 dígitos!")
 });
 
-const toast = useToast();
+//const toast = useToast();
 
 export function SingIn() {
-  //const [isLoading, setIsLoading] = useState(false);
   const { singIn } = useAuth();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
@@ -49,26 +47,22 @@ export function SingIn() {
 
   async function handleSignIn({ email, password }: FormDataProps) {
     try{
-      //setIsLoading(true);
       await singIn(email, password);
     }
     catch (error) {
       const isAppError = error instanceof AppError;
 
       const title = isAppError ? error.message : "Não foi possível entrar. Tente novamente!";
-
-      //setIsLoading(false);
-
-      toast.show({
-        placement: 'top',
-        render: ({ id }) => (
-          <ToastMessagem
-            id={id}
-            title={title}
-            action="error"
-            onClose={() => toast.close(id)} />
-        )
-      });
+      // toast.show({
+      //   placement: 'top',
+      //   render: ({ id }) => (
+      //     <ToastMessagem
+      //       id={id}
+      //       title={title}
+      //       action="error"
+      //       onClose={() => toast.close(id)} />
+      //   )
+      // });
     }
   };
 

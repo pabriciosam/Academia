@@ -50,7 +50,18 @@ export function SingUp() {
 
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
-      const response = await api.post('/user', { name, email, password });
+      const response = await api.post('/users', { name, email, password });
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <ToastMessagem
+            id={id}
+            title="Usuário cadastrado com sucesso!"
+            action="success"
+            onClose={() => toast.close(id)} />
+        )
+      });
     }
     catch (error) {
       const isAppError = error instanceof AppError;
