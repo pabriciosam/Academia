@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
@@ -14,6 +15,7 @@ import { ToastMessagem } from '@components/ToastMessage';
 
 import { api } from '@services/api';
 import { AppError } from '@utils/AppError';
+import { useAuth } from '@hooks/useAuth';
 
 type FormDataProps = {
   name: string;
@@ -36,7 +38,10 @@ const singUpSchema = yup.object({
 });
 
 export function SingUp() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const toast = useToast();
+  const { singIn } = useAuth();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: yupResolver(singUpSchema)
@@ -50,20 +55,15 @@ export function SingUp() {
 
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
-      const response = await api.post('/users', { name, email, password });
+      setIsLoading(true);
 
-      toast.show({
-        placement: 'top',
-        render: ({ id }) => (
-          <ToastMessagem
-            id={id}
-            title="Usuário cadastrado com sucesso!"
-            action="success"
-            onClose={() => toast.close(id)} />
-        )
-      });
+      await api.post('/users', { name, email, password });
+
+      await singIn(email, password);
     }
     catch (error) {
+      setIsLoading(true);
+      
       const isAppError = error instanceof AppError;
 
       const title = isAppError ? error.message : 'Não foi possível criar a conta.';
@@ -169,6 +169,7 @@ export function SingUp() {
               title='Criar e acessar'
               onPress={handleSubmit(handleSignUp)}
               mb='$8'
+              isLoading={isLoading}
             />
 
             <Button

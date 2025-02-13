@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useEffect, useState } from 'react'
 
-import { storageUserSave, storageUserGet } from '@storage/storeUser';
+import { storageUserSave, storageUserGet, storageUserRemove } from '@storage/storeUser';
 
 import { UserDTO } from '@dtos/UserDTO';
 import { api } from '@services/api';
@@ -8,6 +8,8 @@ import { api } from '@services/api';
 export type AuthContextDataProps = {
   user: UserDTO;
   singIn: (email: string, password: string) => Promise<void>;
+  singOut: () => Promise<void>;
+  isLoadingUserStorageData: boolean;
 }
 
 type AuthContextProviderProps = {
@@ -18,6 +20,7 @@ export const AuthContext = createContext<AuthContextDataProps>({} as AuthContext
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState({} as UserDTO);
+  const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true);
 
   async function singIn(email: string, password: string) {
     try {
@@ -32,11 +35,32 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
-  async function loadUserDate(){
-    const userLogged = await storageUserGet();
+async function singOut(){
+  try {
+    setIsLoadingUserStorageData(true);
+    setUser({} as UserDTO);
 
-    if (userLogged){
-      setUser(userLogged);
+    await storageUserRemove();
+  } catch (error) {
+    throw error;
+  }
+  finally{
+    setIsLoadingUserStorageData(false);
+  }
+}
+
+  async function loadUserDate(){
+    try {
+      const userLogged = await storageUserGet();
+
+      if (userLogged){
+        setUser(userLogged);
+      }  
+    } catch (error) {
+      throw error;
+    }
+    finally{
+      setIsLoadingUserStorageData(false);
     }
   }
 
@@ -45,7 +69,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   },[]);
 
   return (
-    <AuthContext.Provider value={{ user, singIn }}>
+    <AuthContext.Provider value={{ user, singIn, singOut, isLoadingUserStorageData }}>
       {children}
     </AuthContext.Provider>
   );
