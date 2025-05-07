@@ -8,6 +8,7 @@ import { api } from '@services/api';
 
 export type AuthContextDataProps = {
   user: UserDTO;
+  updateUserProfile: (userUpdated: UserDTO) => Promise<void>;
   singIn: (email: string, password: string) => Promise<void>;
   singOut: () => Promise<void>;
   isLoadingUserStorageData: boolean;
@@ -59,20 +60,30 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
-async function singOut(){
-  try {
-    setIsLoadingUserStorageData(true);
-    setUser({} as UserDTO);
+  async function singOut(){
+    try {
+      setIsLoadingUserStorageData(true);
+      setUser({} as UserDTO);
 
-    await storageUserRemove();
-    await storageAuthTokenRemove();
-  } catch (error) {
-    throw error;
+      await storageUserRemove();
+      await storageAuthTokenRemove();
+    } catch (error) {
+      throw error;
+    }
+    finally{
+      setIsLoadingUserStorageData(false);
+    }
   }
-  finally{
-    setIsLoadingUserStorageData(false);
+
+  async function updateUserProfile(userUpdated: UserDTO){
+    try {
+      setUser(userUpdated);
+
+      await storageUserSave(userUpdated);
+    } catch (error) {
+      throw error;
+    }
   }
-}
 
   async function loadUserDate(){
     try {
@@ -96,7 +107,7 @@ async function singOut(){
   },[]);
 
   return (
-    <AuthContext.Provider value={{ user, singIn, singOut, isLoadingUserStorageData }}>
+    <AuthContext.Provider value={{ user, singIn, singOut, updateUserProfile, isLoadingUserStorageData }}>
       {children}
     </AuthContext.Provider>
   );
