@@ -16,6 +16,7 @@ import { useAuth } from "@hooks/useAuth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
+import defaultUserPhotoImg from '@assets/userPhotoDefault.png';
 
 type FormDataProps = {
   name: string;
@@ -54,7 +55,6 @@ const profileSchema = yup.object({
 
 export function Profile() {
   const [isUpdating, setUpdating] = useState(false);
-  const [userPhoto, setUserPhoto] = useState('https://github.com/pabriciosam.png');
   
   const toast = useToast();
   const { user, updateUserProfile } = useAuth();
@@ -102,9 +102,40 @@ export function Profile() {
             )
           });
         }
-      }
 
-      setUserPhoto(photoURI);
+        const fileExtension = photoURI.split('.').pop();
+
+        const photoFile: any = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: photoURI,
+          type: `${ photoSelected.assets[0].type}/${fileExtension}`
+        }
+
+        const userPhotoUploadForm = new FormData();
+
+        userPhotoUploadForm.append('avatar', photoFile);
+
+        const avatarUpdatedResponse = await api.patch('/users/avatar', userPhotoUploadForm, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        const userUpdated = user;
+        userUpdated.avatar = avatarUpdatedResponse.data.avatar;
+        updateUserProfile(userUpdated);
+
+        toast.show({
+          placement: "top",
+          render: ({ id }) => (
+            <ToastMessagem
+              id={id}
+              title="Foto atualizada!"
+              action="success"
+              onClose={() => toast.close(id)} />
+          )
+        });
+      }
     }
     catch (erro) {
 
@@ -165,7 +196,12 @@ export function Profile() {
         <Center mt="$6" px="$10">
           <UserPhoto
             alt="Foto do usuário"
-            source={{ uri: userPhoto }}
+            source=
+            {
+              user.avatar ?
+              {uri: `${api.defaults.baseURL}/avatar/${user.avatar}`} :
+              defaultUserPhotoImg
+            }
             size="xl"
           />
 
